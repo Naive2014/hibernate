@@ -4,22 +4,15 @@ package com.test;
 import java.util.ArrayList;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-
 import com.entity.Person;
 import com.entity.User;
 
 public class one_to_one {
 	
 	public static void selectone(){
-		//获取加载配置管理类
-	    Configuration configuration = new Configuration().configure();
-	    //创建Session工厂对象
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
       	//得到Session对象
-        Session session = sessionFactory.openSession();
+        Session session = HibernateSessionFactory.getSession();
         try {
             //查询数据库
             User user =session.get(User.class, 1);
@@ -30,10 +23,9 @@ public class one_to_one {
 		}finally {
 			 //关闭Session
 	        session.close();
-		}
-
-       
+		} 
 	}
+	
 	public static void add(){
 		User user = new User();
 	    user.setPassword("123");
@@ -45,12 +37,8 @@ public class one_to_one {
 	    person.setUser(user);
 	    user.setPerson(person);
 	    
-	    //获取加载配置管理类
-	    Configuration configuration = new Configuration().configure();
-	    //创建Session工厂对象
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-      	//得到Session对象
-        Session session = sessionFactory.openSession();
+	    //得到Session对象
+        Session session = HibernateSessionFactory.getSession();
         //使用Hibernate操作数据库，都要开启事务,得到事务对象
         Transaction transaction = session.getTransaction();
         try {
@@ -71,12 +59,8 @@ public class one_to_one {
 	}
 	
 	public static void query(){
-		//获取加载配置管理类
-	    Configuration configuration = new Configuration().configure();
-	    //创建Session工厂对象
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-      	//得到Session对象
-        Session session = sessionFactory.openSession();
+	    //得到Session对象
+        Session session = HibernateSessionFactory.getSession();
         try {
 			@SuppressWarnings("unchecked")
 			ArrayList<User> arrayList = (ArrayList<User>) session.createQuery("from User").list();
@@ -90,13 +74,9 @@ public class one_to_one {
 	}
 	
 	public static void update(){
-		//获取加载配置管理类
-	    Configuration configuration = new Configuration().configure();
-	    //创建Session工厂对象
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-      	//得到Session对象
-        Session session = sessionFactory.openSession();
-      //使用Hibernate操作数据库，都要开启事务,得到事务对象
+	    //得到Session对象
+        Session session = HibernateSessionFactory.getSession();
+        //使用Hibernate操作数据库，都要开启事务,得到事务对象
         Transaction transaction = session.getTransaction();
         try {
 			User user = session.get(User.class, 1);
@@ -115,11 +95,30 @@ public class one_to_one {
 		}
 	}
 	
+	public static void delect(){
+	    //得到Session对象
+        Session session = HibernateSessionFactory.getSession();
+        //使用Hibernate操作数据库，都要开启事务,得到事务对象
+        Transaction transaction = session.getTransaction();
+        try {
+        	transaction.begin();
+        	 User user =session.get(User.class, 1);
+        	 session.delete(user);
+        	 transaction.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			transaction.rollback();
+		}finally {
+			session.close();
+		}
+	}
+	
 	public static void main(String[] args) {
 		//add();
 		//query();
 		//update();
 		selectone();
+		//delect();
 		
 	}
 }
